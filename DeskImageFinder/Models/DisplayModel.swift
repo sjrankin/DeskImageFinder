@@ -33,6 +33,22 @@ import SwiftUI
     /// Sort fields in ascending order.
     var SortAscending: Bool = true
     
+    /// Side length of a grid tile for the current `ItemSize`. -1 = Teeny, 0 = Small, 1 = Medium, 2 = Large.
+    var TileSide: CGFloat
+    {
+        switch ItemSize
+        {
+            case ...(-1):
+                return 130.0
+            case 1:
+                return 220.0
+            case 2:
+                return 300.0
+            default:
+                return 160.0
+        }
+    }
+
     /// Returns the number of columns of thumbnails in the grid view depending on the width of the view.
     /// - Parameter For: The width of the view.
     /// - Returns: Number of columns of thumbnails.

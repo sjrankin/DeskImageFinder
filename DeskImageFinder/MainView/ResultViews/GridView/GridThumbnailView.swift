@@ -14,8 +14,9 @@ struct GridThumbnailView: View
     @State var ImageName: String = ""
     @State var DirectoryName: String = ""
     @State var score: Float = 0.0
-    @State var width: Double = 120.0
-    @State var height: Double = 120.0
+    /// Thumbnail size. Plain values (not `@State`) so the grid can resize the thumbnails when the size changes.
+    var width: Double = 120.0
+    var height: Double = 120.0
     @State var ShowLargerImage: Bool = false
     @State var ContextLargerImage: Bool = false
     @State var Search: DataModel = DataModel()
@@ -27,14 +28,14 @@ struct GridThumbnailView: View
             geometry in
             if let FinalImage = image
             {
-                VStack(alignment: .center)
+                VStack(alignment: .center, spacing: 0)
                 {
-                    Spacer()
+                    Spacer(minLength: 0)
                     Image(nsImage: FinalImage)
                         .resizable()
                         .scaledToFit()
                         .frame(width: width, height: height)
-                        .padding(-4)
+                        .padding(.top, 10)
                     VStack
                     {
                         if !DirectoryName.isEmpty
@@ -71,7 +72,8 @@ struct GridThumbnailView: View
                         }
                         .padding(.top, -4)
                     }
-                    .frame(height: (geometry.size.height - height) + 14)
+                    .padding(.bottom, 6)
+                    .frame(height: geometry.size.height - height - 10, alignment: .bottom)
                     .background(Color(NSColor(calibratedRed: 0.69, green: 0.69, blue: 0.69, alpha: 0.85)))
                 }
                 .onTapGesture(count: 2)

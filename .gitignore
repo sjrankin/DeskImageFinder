@@ -48,3 +48,6 @@ GoogleService-Info.plist
 .vscode/
 *.swp
 .claude/settings.local.json
+
+# Icon exports
+Icon Exports/

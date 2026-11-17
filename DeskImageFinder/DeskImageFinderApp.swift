@@ -22,5 +22,8 @@ struct DeskImageFinderApp: App
             }
             .navigationTitle("Similar Image Finder")
         }
+        .defaultSize(width: MainView.MinimumWindowWidth + 200,
+                     height: MainView.MinimumWindowHeight + 160)
+        .windowResizability(.contentMinSize)
     }
 }

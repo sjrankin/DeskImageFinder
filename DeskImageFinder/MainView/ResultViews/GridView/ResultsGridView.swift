@@ -11,66 +11,51 @@ struct ResultsGridView: View
 {
     @State var SearchModel: SessionsModel
     @State var Display: DisplayModel
-    @State var Columns: [GridItem] = [GridItem(.flexible()),
-                                      GridItem(.flexible()),
-                                      GridItem(.flexible()),
-                                      GridItem(.flexible())]
-    
+   
     var body: some View
     {
+        let Side = Display.TileSide
+        let Groups = ResultArranger.Arrange(SearchModel.Current.Results,
+                                            Search: SearchModel.Current,
+                                            Filter: Display.ShowResultTypes,
+                                            SortBy: Display.GridSortBy,
+                                            Ascending: Display.SortAscending,
+                                            Group: Display.GroupResults)
         ScrollView(.vertical)
         {
-            LazyVGrid(columns: Columns)
+            LazyVStack(alignment: .leading, spacing: 8)
             {
-                ForEach(SearchModel.Current.Results.sorted(by: {$0.Score < $1.Score}), id: \.self)
+                ForEach(Groups)
                 {
-                    result in
-                    if ShowResult(With: result.Score, Filter: Display.ShowResultTypes)
+                    Section in
+                    if let Title = Section.Title
                     {
-                        GridThumbnailView(image: result.TargetImage,
-                                          ImageURL: result.Path,
-                                          ImageName: Files.NameFrom(result.Path),
-                                          score: result.Score,
-                                          Search: SearchModel.Current)
-                        .padding(.vertical, 10)
-                        .frame(width: 160, height: 160)
+                        Text("\(Title) (\(Section.Items.count))")
+                            .font(.headline)
+                            .padding(.horizontal, 8)
+                            .padding(.top, 24)
                     }
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: Side), spacing: 8)], spacing: 8)
+                    {
+                        ForEach(Section.Items)
+                        {
+                            result in
+                            GridThumbnailView(image: result.TargetImage,
+                                              ImageURL: result.Path,
+                                              ImageName: Files.NameFrom(result.Path),
+                                              score: result.Score,
+                                              width: Side - 64,
+                                              height: Side - 64,
+                                              Search: SearchModel.Current)
+                            .frame(width: Side, height: Side)
+                        }
+                    }
+                    .padding(.horizontal, 8)
                 }
             }
             .padding(.bottom, 32)
-            .onGeometryChange(for: CGRect.self)
-            {
-                proxy in
-                proxy.frame(in: .global)
-            } action:
-            {
-                new in
-                let GridViewWidth = new.width
-                let ColumnCount = DisplayModel.GridColumnCount(For: GridViewWidth)
-                self.Columns = Array(repeating: GridItem(.flexible()),
-                                     count: ColumnCount)
-            }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color(NSColor(calibratedRed: 0.85, green: 0.85, blue: 0.85, alpha: 1.0)))
-        }
-    }
-    
-    /// Filters a given item depending on the comparison result and how the user set the filter.
-    /// - Parameter With: The score of the image comparison.
-    /// - Parameter Filter: The UI filter setting as per the user.
-    /// - Returns: True if the score meets the filter, false if not.
-    func ShowResult(With Score: Float, Filter: Int) -> Bool
-    {
-        let ResultType = SearchModel.Current.ResultType(With: Score)
-        switch Filter
-        {
-            case 0:
-                return ResultType == .Exact
-            case 1:
-                return (ResultType == .Exact || ResultType == .Similar)
-            case 2:
-                return true
-            default:
-                return true
         }
     }
 }

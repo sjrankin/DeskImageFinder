@@ -24,7 +24,8 @@ struct TopViewBar: View
     @AppStorage("ShowBig") var ShowBig: Bool = true
     @AppStorage("ShowResultType") var ShowResultType: Int = 2
     @AppStorage("ItemSize") var ItemSize: Int = 0
-    @AppStorage("SortAscending") var SortAscending: Bool = false
+    @AppStorage("ResultsSortAscending") var SortAscending: Bool = true
+    @AppStorage("GroupResults") var GroupResults: Bool = true
     @AppStorage("GridSortBy") var GridSortBy: String = SortResultsGrid.Similarity.rawValue
     
     var body: some View
@@ -82,10 +83,7 @@ struct TopViewBar: View
                 .onChange(of: Model.GroupResults)
                 {
                     old, new in
-                    if old != new
-                    {
-                        Model.GroupResults = new
-                    }
+                    GroupResults = new
                 }
             }
             .frame(width: 35)
@@ -115,7 +113,7 @@ struct TopViewBar: View
             Divider()
             Picker("Sort by", selection: $Model.GridSortBy)
             {
-                Text("Similarty")
+                Text("Similarity")
                     .tag(SortResultsGrid.Similarity)
                 Text("Size")
                     .tag(SortResultsGrid.ImageSize)
@@ -130,6 +128,7 @@ struct TopViewBar: View
             {
                 old, new in
                 Model.GridSortBy = new
+                GridSortBy = new.rawValue
             }
             .pickerStyle(MenuPickerStyle())
             .frame(width: 150)

@@ -9,6 +9,15 @@ import SwiftUI
 
 struct MainView: View
 {
+    /// Minimum width of the source picker sidebar. Holds the 320 point source image plus its padding.
+    static let MinimumSidebarWidth: CGFloat = 370
+    /// Minimum width of the results pane. Holds the full top toolbar (about 800 points of controls).
+    static let MinimumDetailWidth: CGFloat = 820
+    /// Minimum window width (sidebar plus results pane).
+    static let MinimumWindowWidth: CGFloat = MinimumSidebarWidth + MinimumDetailWidth
+    /// Minimum window height. Holds the source image, its caption and the Load Image button.
+    static let MinimumWindowHeight: CGFloat = 640
+
     @State var Model: DisplayModel = DisplayModel()
     @State var SearchModel = SessionsModel()
     @State var ResultsInfo: String = "Something interesting here."
@@ -20,7 +29,8 @@ struct MainView: View
     @AppStorage("ViewStyle") var ViewStyle: ResultViewTypes = .Thumbnails
     @AppStorage("ShowResultType") var ShowResultType: Int = 2
     @AppStorage("ItemSize") var ItemSize: Int = 0
-    @AppStorage("SortAscending") var SortAscending: Bool = false
+    @AppStorage("ResultsSortAscending") var SortAscending: Bool = true
+    @AppStorage("GroupResults") var GroupResults: Bool = true
     @AppStorage("GridSortBy") var GridSortBy: String = SortResultsGrid.Similarity.rawValue
      
     // Process model data
@@ -55,7 +65,7 @@ struct MainView: View
                 SourcePicker(SearchModel: SearchModel,
                              Annotation: $ResultsInfo,
                              ProcessState: ProcessState)
-                    .navigationSplitViewColumnWidth(min: 200, ideal: 300, max: .infinity)
+                    .navigationSplitViewColumnWidth(min: Self.MinimumSidebarWidth, ideal: 380, max: .infinity)
                     .onChange(of: SearchModel.Current.Results)
                 {
                     old, new in
@@ -76,6 +86,8 @@ struct MainView: View
             .frame(width: geometry.size.width,
                    height: geometry.size.height)
         }
+        .frame(minWidth: Self.MinimumWindowWidth,
+               minHeight: Self.MinimumWindowHeight)
         .onAppear()
         {
             ProcessState.StatusType = .Ready
@@ -91,6 +103,7 @@ struct MainView: View
         Model.ResultsViewStyle = ViewStyle
         Model.ItemSize = ItemSize
         Model.SortAscending = SortAscending
+        Model.GroupResults = GroupResults
         Model.GridSortBy = SortResultsGrid(rawValue: GridSortBy) ?? .Similarity
 
         // Search model

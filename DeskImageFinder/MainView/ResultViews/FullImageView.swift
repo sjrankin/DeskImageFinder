@@ -19,7 +19,7 @@ struct FullImageView: View
         {
             VStack
             {
-                Text("Search Options")
+                Text(Files.NameFrom(ImageURL))
                     .font(.headline)
                     .padding(.top, 4)
                 Divider()
@@ -64,9 +64,21 @@ struct FullImageView: View
                     }
                     .frame(maxHeight: 100)
                 Divider()
-                Button("Close")
+                HStack
                 {
-                    Dismiss()
+                    if let TheURL = ImageURL
+                    {
+                        Button("Show in Finder", systemImage: "folder")
+                        {
+                            // Opens the file's directory in Finder with the file selected.
+                            NSWorkspace.shared.activateFileViewerSelecting([TheURL])
+                        }
+                        .help("Open the image's directory in Finder with the image selected.")
+                    }
+                    Button("Close")
+                    {
+                        Dismiss()
+                    }
                 }
                 .padding(4)
                 .padding(.bottom, 6)
